@@ -1,0 +1,42 @@
+# Databases. jobhunt.db holds the Slack bot and app tokens, the Anthropic key,
+# every scored posting and the application tracker. It is the one file in this
+# project that must never reach a remote.
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+backups/
+backups-from-pi/
+
+# Service environment: the web password, the session key, the Anthropic key.
+jobhunt.env
+*.env
+.env
+
+# Generated CVs and cover letters — real personal documents.
+documents/
+
+# The real application tracker: companies applied to, and a referrer's name.
+# tracker-template.example.csv is committed in its place.
+tracker-template.csv
+
+# Local profile: name, contact details, CV, work history.
+profile_local.json
+
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# macOS
+.DS_Store
+
+# Personal operational notes, and the point-in-time audit of one deployment.
+# Both are written about a specific person's install — kept locally, not in
+# the repository. README.md is the generic one.
+NOTES.local.md
+CODE_REVIEW.local.md
+CODE_REVIEW.md

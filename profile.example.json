@@ -1,0 +1,14 @@
+{
+  "contact": {
+    "name": "Your Name",
+    "email": "you@example.com",
+    "phone": "+00 000 0000000",
+    "location": "Your City, Country",
+    "linkedin": "https://www.linkedin.com/in/your-handle"
+  },
+  "summary": "Replace this with your career summary: what you do, how long you have done it,\nand the roles you have held. Write it the way you would say it out loud — this\ntext is fed to the model that scores postings and drafts your CV, so detail\nhere is what makes both of them accurate.\n\nCurrent — Employer, City (Month Year to present):\n- What you own, and what you actually did with it.\n- An achievement with a number attached, if you have one.\n\nPrior — Employer (Years):\n- Same again, more briefly.\n\nEducation: Degree, Institution, Country (Years).\n",
+  "skills": "Replace this with your skills, as a comma-separated run of phrases rather than\na bullet list: tools and platforms you administer, languages you write, methods\nyou use, anything a posting might name.\n",
+  "preferences": "Target roles: the job titles you actually want.\n\nRegion: the cities you can commute to, and whether you will consider remote,\nhybrid or relocation.\n\nLanguages: which you speak and at what level, and the working language you\nprefer.\n\nWork authorisation: your right to work where you are applying.\n",
+  "languages": "English: Fluent",
+  "constraints": "Things the model must never overstate about you. These are injected into every\nCV and cover letter prompt as hard rules, so write them as plain statements:\n\n- If your level in a language is below what postings ask for, say so here and\n  it will be stated honestly rather than hidden.\n- If you have mentored but never managed, say so here and you will not be\n  described as having run a team.\n"
+}

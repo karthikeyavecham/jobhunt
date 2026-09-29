@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}JobHunt — Writing prompts{% endblock %}
+{% block subtitle %}What the model is told before it writes a CV or cover letter{% endblock %}
+
+{% block content %}
+
+<div class="tabs">
+  <a class="tab" href="{{ url_for('config_page') }}">Configuration</a>
+  <a class="tab active" href="{{ url_for('prompts_page') }}">Writing prompts</a>
+</div>
+
+<section class="panel">
+  <h2>How this works</h2>
+  <div class="meta">
+    Each document is generated from three inputs: your stored profile, the job
+    posting, and the prompt below. The profile and the posting are facts — the
+    prompt is the only part that decides what gets <i>selected</i> from them and
+    how it is written, which is where most of the quality difference lives.
+    <br><br>
+    The prompt sent for a CV is <b>CV system</b> followed by <b>shared rules</b>.
+    Changes apply to the next document generated; documents already produced are
+    untouched. Currently recording as
+    <span class="chip {% if version == 'custom' %}warn{% else %}mute{% endif %}">{{ version }}</span>.
+  </div>
+</section>
+
+{% for block in blocks %}
+<section class="panel">
+  <h2 style="display:flex; align-items:center; gap:10px">
+    {{ block.name.replace('_', ' ')|title }}
+    {% if block.customised %}<span class="chip warn">customised</span>
+    {% else %}<span class="chip mute">shipped wording</span>{% endif %}
+  </h2>
+  <div class="meta" style="margin-bottom:10px">{{ block.description }}</div>
+
+  {% if block.name == 'shared_rules' %}
+  <div class="meta" style="margin-bottom:10px; border-left:3px solid var(--amber); padding-left:10px">
+    These are the rules that stop the model inventing experience, naming
+    internal projects from your employer, or overstating anything you listed
+    under "Never overstate" on the Profile page.
+    Removing one removes that protection — the code does not enforce them
+    separately, apart from the confidentiality scan that blocks a document
+    outright if a blocklisted term reaches it.
+  </div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('save_prompts') }}">
+    <textarea name="{{ block.name }}" rows="18" spellcheck="false"
+              style="width:100%; font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+                     font-size:12.5px; line-height:1.5; padding:10px">{{ block.text }}</textarea>
+    <div class="toolbar" style="margin-top:10px">
+      <button type="submit">Save</button>
+      <span class="sub" style="margin:0">
+        {{ block.text|length }} characters (shipped version: {{ block.default_length }})
+      </span>
+    </div>
+  </form>
+
+  {% if block.customised %}
+  <form method="post" action="{{ url_for('reset_prompt') }}" style="margin-top:8px">
+    <input type="hidden" name="name" value="{{ block.name }}">
+    <button class="ghost" type="submit">Restore the shipped wording</button>
+  </form>
+  {% endif %}
+</section>
+{% endfor %}
+
+<section class="panel">
+  <h2>What actually gets sent</h2>
+  <div class="meta" style="margin-bottom:10px">
+    The composed prompts, exactly as the model receives them. The profile and
+    the posting are appended separately as the user message.
+  </div>
+  <details>
+    <summary style="cursor:pointer">CV — {{ effective_cv|length }} characters</summary>
+    <pre style="white-space:pre-wrap; font-size:12px; line-height:1.5; margin-top:10px">{{ effective_cv }}</pre>
+  </details>
+  <details style="margin-top:10px">
+    <summary style="cursor:pointer">Cover letter — {{ effective_letter|length }} characters</summary>
+    <pre style="white-space:pre-wrap; font-size:12px; line-height:1.5; margin-top:10px">{{ effective_letter }}</pre>
+  </details>
+</section>
+
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}JobHunt — Sources{% endblock %}
+{% block subtitle %}Where postings are fetched from, and whether each one is working{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <h2>Configured sources</h2>
+  {% if sources %}
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Adapter</th>
+        <th>Config</th>
+        <th>Last run</th>
+        <th class="num">Found</th>
+        <th>Health</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in sources %}
+      <tr>
+        <td><b>{{ s.name }}</b></td>
+        <td><span class="chip mute">{{ s.adapter }}</span></td>
+        <td><code style="font-size:12px">{{ s.config_json }}</code></td>
+        <td>{{ s.last_run_human }}</td>
+        <td class="num">{{ s.last_found }}</td>
+        <td>
+          {% if s.last_status == 'ok' %}
+            <span class="chip ok">ok</span>
+          {% elif s.last_status == 'error' %}
+            <span class="chip bad" title="{{ s.last_error }}">error</span>
+          {% else %}
+            <span class="chip mute">never run</span>
+          {% endif %}
+          {% if not s.enabled %}<span class="chip warn">disabled</span>{% endif %}
+        </td>
+        <td style="white-space:nowrap">
+          <form method="post" action="{{ url_for('test_source', source_id=s.id) }}" style="display:inline">
+            <button class="small" type="submit">Test</button>
+          </form>
+          <form method="post" action="{{ url_for('toggle_source', source_id=s.id) }}" style="display:inline">
+            <button class="small" type="submit">{{ "Disable" if s.enabled else "Enable" }}</button>
+          </form>
+          <form method="post" action="{{ url_for('delete_source', source_id=s.id) }}" style="display:inline">
+            <button class="ghost" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% if s.last_status == 'error' and s.last_error %}
+      <tr>
+        <td colspan="7" style="color:var(--red); font-size:13px; padding-top:0">{{ s.last_error }}</td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">No sources configured.</div>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <h2>Add a company career board</h2>
+  <div class="meta" style="margin-bottom:14px">
+    Most companies post to their own board before anything reaches an aggregator.
+    Each board is identified by a <b>slug</b> — the company's part of the board
+    URL, e.g. <code>gitlab</code> in <code>boards.greenhouse.io/gitlab</code>.
+    Slugs cannot be guessed, so add one and press <b>Test</b>: it reports how many
+    postings came back and whether they include descriptions.
+  </div>
+
+  <form method="post" action="{{ url_for('add_source') }}">
+    <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap">
+      <div style="min-width:250px">
+        <label for="adapter">Platform</label>
+        <select id="adapter" name="adapter">
+          {% for name, label in adapters %}
+          <option value="{{ name }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="width:180px">
+        <label for="slug">Company slug</label>
+        <input id="slug" name="slug" placeholder="gitlab" autocomplete="off">
+      </div>
+      <div style="width:190px">
+        <label for="company">Company name (optional)</label>
+        <input id="company" name="company" placeholder="GitLab">
+      </div>
+      <div style="width:190px">
+        <label for="name">Source name (optional)</label>
+        <input id="name" name="name" placeholder="auto">
+      </div>
+      <button type="submit">Add source</button>
+    </div>
+  </form>
+
+  <div class="meta" style="margin-top:14px">
+    <b>Where to find the slug</b><br>
+    Greenhouse — <code>boards.greenhouse.io/<b>slug</b></code> ·
+    Lever — <code>jobs.lever.co/<b>slug</b></code> ·
+    SmartRecruiters — <code>jobs.smartrecruiters.com/<b>slug</b></code> ·
+    Personio — <code><b>slug</b>.jobs.personio.de</code> ·
+    Recruitee — <code><b>slug</b>.recruitee.com</code>
+    <br><br>
+    Deleting a source that has stored postings is refused, because its jobs —
+    and any applications tracked against them — would be deleted with it.
+    Disable it instead.
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+{% block title %}{{ job.title }} — JobHunt{% endblock %}
+{% block subtitle %}{{ job.company }}{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <div style="display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; align-items:flex-start">
+    <div style="flex:1; min-width:280px">
+      <h2 style="margin-bottom:6px">{{ job.title }}</h2>
+      <div class="meta" style="font-size:14px">
+        <b>{{ job.company }}</b>
+        {% if job.location %} · {{ job.location }}{% endif %}
+        {% if job.remote %} · <span class="chip ok">home office possible</span>{% endif %}
+      </div>
+      <div class="meta">
+        {{ job.employment_type or "hours not stated" }} ·
+        posted {{ job.posted_human }} ·
+        first seen {{ job.first_seen_human }} ·
+        via <span class="chip mute">{{ job.source_name }}</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+      <a class="tab" href="{{ job.url }}" target="_blank" rel="noopener">Open posting ↗</a>
+      {% if job.status != 'shortlisted' %}
+      <form method="post" action="{{ url_for('set_job_status', job_id=job.id) }}">
+        <input type="hidden" name="status" value="shortlisted">
+        <button type="submit">Shortlist</button>
+      </form>
+      {% endif %}
+      {% if job.status != 'dismissed' %}
+      <form method="post" action="{{ url_for('set_job_status', job_id=job.id) }}">
+        <input type="hidden" name="status" value="dismissed">
+        <button class="small" type="submit">Dismiss</button>
+      </form>
+      {% endif %}
+      {% if job.status != 'new' %}
+      <form method="post" action="{{ url_for('set_job_status', job_id=job.id) }}">
+        <input type="hidden" name="status" value="new">
+        <button class="small" type="submit">Back to triage</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <div style="margin-top:14px">
+    <span class="chip {% if job.status=='shortlisted' %}ok{% elif job.status=='dismissed' %}bad{% endif %}">
+      {{ job.status }}
+    </span>
+    {% if job.alt_sources %}
+      <span class="chip warn">also listed on {{ job.alt_sources|length }} other source{{ '' if job.alt_sources|length == 1 else 's' }}</span>
+    {% endif %}
+  </div>
+</section>
+
+{% if job.fit_score is not none %}
+<section class="panel">
+  <h2>
+    Fit assessment
+    <span class="score {{ job.verdict }}" style="margin-left:8px">{{ job.fit_score }}</span>
+    <span class="chip">{{ job.verdict }}</span>
+  </h2>
+  <div class="meta" style="margin-bottom:14px">{{ job.rationale }}</div>
+
+  <div class="kv" style="margin-bottom:16px">
+    <div>
+      <div class="k">German required</div>
+      <div class="v">
+        {% if job.german_level_required == 'not_stated' %}
+          <span class="chip mute">not stated</span>
+        {% else %}
+          <span class="chip {% if job.german_level_required in ('none','A2') %}ok{% else %}warn{% endif %}">
+            {{ job.german_level_required }}</span>
+        {% endif %}
+      </div>
+    </div>
+    <div>
+      <div class="k">English sufficient</div>
+      <div class="v">{% if job.english_sufficient %}<span class="chip ok">yes</span>
+        {% else %}<span class="chip mute">not indicated</span>{% endif %}</div>
+    </div>
+    <div>
+      <div class="k">Salary</div>
+      <div class="v">{% if job.salary_stated %}<span class="chip">stated</span>
+        {% else %}<span class="chip mute">not stated</span>{% endif %}</div>
+    </div>
+    <div>
+      <div class="k">Seniority</div>
+      <div class="v">{{ job.seniority or "—" }}</div>
+    </div>
+    <div>
+      <div class="k">Remote policy</div>
+      <div class="v">{{ job.remote_policy or "—" }}</div>
+    </div>
+    <div>
+      <div class="k">People management</div>
+      <div class="v">{% if job.people_management_required %}
+        <span class="chip warn">required</span>{% else %}<span class="chip ok">not required</span>{% endif %}</div>
+    </div>
+  </div>
+
+  {% if job.language_quote %}
+    <div class="k">Language requirement, quoted from the posting</div>
+    <div class="quote">“{{ job.language_quote }}”</div>
+  {% endif %}
+  {% if job.salary_quote %}
+    <div class="k">Salary, quoted from the posting</div>
+    <div class="quote">“{{ job.salary_quote }}”</div>
+  {% endif %}
+
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; margin-top:16px">
+    <div>
+      <div class="k">What matches</div>
+      {% if job.matched %}<ul class="tight">{% for m in job.matched %}<li>{{ m }}</li>{% endfor %}</ul>
+      {% else %}<div class="empty">Nothing recorded.</div>{% endif %}
+    </div>
+    <div>
+      <div class="k">Gaps</div>
+      {% if job.gaps %}<ul class="tight">{% for g in job.gaps %}<li>{{ g }}</li>{% endfor %}</ul>
+      {% else %}<div class="empty">None recorded.</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="meta" style="margin-top:14px">
+    Scored by <code>{{ job.model_used }}</code>.
+    <form method="post" action="{{ url_for('score_one', job_id=job.id) }}" style="display:inline">
+      <button class="small" type="submit">Re-score</button>
+    </form>
+  </div>
+</section>
+{% else %}
+<section class="panel">
+  <h2>Fit assessment</h2>
+  <div class="empty">Not scored yet.</div>
+  <form method="post" action="{{ url_for('score_one', job_id=job.id) }}">
+    <button class="small" type="submit">Score now</button>
+  </form>
+</section>
+{% endif %}
+
+<section class="panel">
+  <h2>Application tracking</h2>
+  {% if application %}
+    <div class="meta" style="margin-bottom:12px">
+      <span class="chip {% if application.pipeline_status in ('offer','interview') %}ok{% else %}warn{% endif %}">
+        {{ application.pipeline_status }}</span>
+      {% if application.shortlisted_at %}· shortlisted {{ application.shortlisted_at[:10] }}{% endif %}
+      {% if application.applied_at %}· applied {{ application.applied_at }}{% endif %}
+      {% if application.updated_at %}· updated {{ application.updated_at[:10] }}{% endif %}
+    </div>
+  {% else %}
+    <div class="meta" style="margin-bottom:12px">
+      Not tracked yet — setting a status below starts tracking it.
+    </div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('update_pipeline', job_id=job.id) }}">
+    <div class="kv" style="margin-bottom:12px">
+      <div>
+        <label for="pipeline_status">Status</label>
+        <select id="pipeline_status" name="pipeline_status">
+          {% for stage in pipeline %}
+          <option value="{{ stage }}"
+            {% if application and application.pipeline_status == stage %}selected{% endif %}>
+            {{ stage }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="applied_at">Applied on</label>
+        <input id="applied_at" name="applied_at" type="date"
+               value="{{ application.applied_at if application else '' }}">
+      </div>
+      <div>
+        <label for="next_action_date">Next action due</label>
+        <input id="next_action_date" name="next_action_date" type="date"
+               value="{{ application.next_action_date if application else '' }}">
+      </div>
+      <div>
+        <label for="next_action">Next action</label>
+        <input id="next_action" name="next_action"
+               value="{{ application.next_action if application else '' }}"
+               placeholder="e.g. Follow up with the recruiter">
+      </div>
+      <div>
+        <label for="contact_name">Contact</label>
+        <input id="contact_name" name="contact_name"
+               value="{{ application.contact_name if application else '' }}">
+      </div>
+      <div>
+        <label for="referral">Referral</label>
+        <input id="referral" name="referral"
+               value="{{ application.referral if application else '' }}"
+               placeholder="e.g. Peter Hartmann">
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label for="notes">Notes</label>
+      <textarea id="notes" name="notes" rows="3"
+        placeholder="Interview dates, names, what was discussed…">{{ application.notes if application and application.notes else '' }}</textarea>
+    </div>
+    <button type="submit">Save tracking</button>
+    <span class="meta" style="margin-left:10px">
+      Blank fields are left unchanged, so this never wipes what is already there.
+    </span>
+  </form>
+</section>
+
+<section class="panel">
+  <h2>Application documents</h2>
+  <div class="meta" style="margin-bottom:12px">
+    Contact details, and the German level, are inserted from your profile — never
+    written by the model. The draft is scanned for internal terms before anything
+    is saved.
+  </div>
+
+  <form method="post" action="{{ url_for('generate_document_route', job_id=job.id) }}">
+    <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap">
+      <div style="min-width:230px">
+        <label for="template">Template</label>
+        <select id="template" name="template">
+          {% for key, label, description in templates %}
+          <option value="{{ key }}" {% if key==default_template %}selected{% endif %}
+                  title="{{ description }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="width:190px">
+        <label for="brand">Brand colour (blank = let Claude suggest)</label>
+        <input id="brand" name="brand" placeholder="{{ default_brand }}">
+      </div>
+      <button type="submit" name="kind" value="cv">Generate CV</button>
+      <button class="small" type="submit" name="kind" value="cover_letter">Generate cover letter</button>
+    </div>
+  </form>
+
+  <div class="meta" style="margin-top:10px">
+    {% if pdf_available %}
+      A PDF is produced alongside the .docx.
+    {% else %}
+      <span class="chip warn">docx only</span>
+      LibreOffice is not installed on this host, so no PDF is produced here.
+    {% endif %}
+    Generation takes roughly a minute.
+  </div>
+
+  {% if docs %}
+  <table style="margin-top:16px">
+    <thead><tr><th>Document</th><th>Version</th><th>Colour</th><th>Generated by</th><th></th></tr></thead>
+    <tbody>
+      {% for d in docs %}
+      <tr>
+        <td>{{ "CV" if d.kind == "cv" else "Cover letter" }}
+            <span class="chip mute">{{ d.format }}</span></td>
+        <td>v{{ d.version }}</td>
+        <td><span class="chip" style="background:{{ d.brand_color }}1a; color:{{ d.brand_color }}">{{ d.brand_color }}</span></td>
+        <td class="meta">{{ d.model_used }}</td>
+        <td><a class="tab" href="{{ url_for('download_document', document_id=d.id) }}">Download</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">Nothing generated for this role yet.</div>
+  {% endif %}
+</section>
+
+{% if job.alt_sources %}
+<section class="panel">
+  <h2>Also found at</h2>
+  <div class="meta">The same role arriving from another source. It is stored once and scored once.</div>
+  <ul style="margin-top:10px; padding-left:20px; font-size:14px">
+    {% for alt in job.alt_sources %}
+    <li><a href="{{ alt.url }}" target="_blank" rel="noopener">{{ alt.url }}</a></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<section class="panel">
+  <h2>Description</h2>
+  {% if job.description_text %}
+  <div style="white-space: pre-wrap; font-size: 14px; line-height: 1.6">{{ job.description_text }}</div>
+  {% else %}
+  <div class="empty">No description was returned by this source.</div>
+  {% endif %}
+</section>
+{% endblock %}

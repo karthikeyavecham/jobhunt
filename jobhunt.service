@@ -1,0 +1,38 @@
+[Unit]
+Description=JobHunt (job aggregation, scoring, Slack and document generation)
+# Slack, the Arbeitsagentur and LM Studio all need the network up.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# __USER__ and __APPDIR__ are filled in by install-jobhunt.sh
+User=__USER__
+WorkingDirectory=__APPDIR__
+Environment=HOST=0.0.0.0
+Environment=PORT=5002
+Environment=PYTHONUNBUFFERED=1
+# The app directory IS the `jobhunt` package, so its parent must be on the
+# path for `python -m jobhunt.app` to resolve. On the Mac this happens by
+# accident because the package sits inside the working directory; here it has
+# to be explicit.
+Environment=PYTHONPATH=__PARENTDIR__
+# Required before the app will bind to a non-loopback address, because the
+# database holds Slack tokens, an API key and personal data.
+EnvironmentFile=__APPDIR__/jobhunt.env
+ExecStart=__APPDIR__/venv/bin/python -m jobhunt.app
+
+# The Socket Mode WebSocket and the scheduler live in this process, so a
+# restart re-establishes both. Restart generously: the usual failure is the
+# network not being ready yet at boot.
+Restart=on-failure
+RestartSec=10
+
+# Modest hardening. The app writes only to its own directory.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=__APPDIR__
+
+[Install]
+WantedBy=multi-user.target

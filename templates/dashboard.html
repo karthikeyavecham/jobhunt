@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}JobHunt — Dashboard{% endblock %}
+
+{% block content %}
+<div class="cards">
+  <div class="card">
+    <div class="label">Relevant jobs</div>
+    <div class="value">{{ stats.total }}</div>
+    <div class="hint">{{ stats.new }} awaiting triage · {{ stats.excluded }} out of region</div>
+  </div>
+  <div class="card">
+    <div class="label">Shortlisted</div>
+    <div class="value">{{ stats.shortlisted }}</div>
+    <div class="hint">{{ stats.dismissed }} dismissed</div>
+  </div>
+  <div class="card">
+    <div class="label">Awaiting scoring</div>
+    <div class="value">{{ stats.pending_scoring }}</div>
+    <div class="hint">{{ stats.pending_hint }}</div>
+  </div>
+  <div class="card">
+    <div class="label">Sources</div>
+    <div class="value">{{ stats.sources_ok }}/{{ stats.sources_total }}</div>
+    <div class="hint">healthy on last run</div>
+  </div>
+  <div class="card">
+    <div class="label">Last fetch</div>
+    <div class="value" style="font-size:16px">{{ stats.last_run or "never" }}</div>
+    <div class="hint">
+      {% if stats.last_run_counts %}{{ stats.last_run_counts }}{% else %}no runs yet{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <form method="post" action="{{ url_for('fetch_now') }}">
+    <button type="submit">Fetch now</button>
+  </form>
+  <form method="post" action="{{ url_for('score_pending_route') }}">
+    <button class="small" type="submit">Score unscored</button>
+  </form>
+  <form method="post" action="{{ url_for('run_cycle_now') }}">
+    <button class="small" type="submit">Run full cycle</button>
+  </form>
+  <span class="sub" style="margin:0">
+    A full cycle fetches, scores and posts to Slack — the same thing the schedule runs.
+  </span>
+</div>
+
+<div class="tabs">
+  {% for key, caption in [('new','Awaiting triage'), ('shortlisted','Shortlisted'),
+                          ('dismissed','Dismissed'), ('all','All relevant'),
+                          ('excluded','Out of region')] %}
+  <a class="tab {% if status == key %}active{% endif %}"
+     href="{{ url_for('dashboard', status=key, sort=sort,
+                      day=window.day, days=window.days) }}">{{ caption }}</a>
+  {% endfor %}
+</div>
+
+<section class="panel" style="padding:14px 18px">
+  <div style="display:flex; gap:18px; align-items:flex-end; flex-wrap:wrap">
+    <div>
+      <label for="sort">Sort by</label>
+      <select id="sort" name="sort" style="width:auto"
+              onchange="location.href=this.value">
+        {% for key, option in sorts.items() %}
+        <option value="{{ url_for('dashboard', status=status, sort=key,
+                                  day=window.day, days=window.days) }}"
+                {% if sort == key %}selected{% endif %}>{{ option.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label for="day">First seen on</label>
+      <select id="day" name="day" style="width:auto"
+              onchange="location.href=this.value">
+        <option value="{{ url_for('dashboard', status=status, sort=sort) }}"
+                {% if not window.label %}selected{% endif %}>Any day</option>
+        {% for days in day_shortcuts %}
+        <option value="{{ url_for('dashboard', status=status, sort=sort, days=days) }}"
+                {% if window.days == days %}selected{% endif %}>
+          {% if days == 1 %}Today{% else %}Last {{ days }} days{% endif %}</option>
+        {% endfor %}
+        {% if day_counts %}
+        <optgroup label="Individual days">
+          {% for iso, count in day_counts %}
+          <option value="{{ url_for('dashboard', status=status, sort=sort, day=iso) }}"
+                  {% if window.day == iso %}selected{% endif %}>
+            {{ iso }} — {{ count }} posting{{ '' if count == 1 else 's' }}</option>
+          {% endfor %}
+        </optgroup>
+        {% endif %}
+      </select>
+    </div>
+
+    {% if window.label %}
+    <div class="meta">
+      Showing {{ jobs|length }} · {{ window.label }}
+      <a href="{{ url_for('dashboard', status=status, sort=sort) }}">clear</a>
+    </div>
+    {% else %}
+    <div class="meta">Showing {{ jobs|length }}{% if jobs|length == 150 %} (capped){% endif %}</div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="panel">
+  <h2>{{ {'new':'Awaiting triage','shortlisted':'Shortlisted','dismissed':'Dismissed'}.get(status, 'All postings') }}</h2>
+  {% if jobs %}
+  <table>
+    <thead>
+      <tr>
+        <th style="width:60px">Fit</th>
+        <th>Role</th>
+        <th>Location</th>
+        <th>Posted</th>
+        <th>First seen</th>
+        <th>Source</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for job in jobs %}
+      <tr>
+        <td>
+          {% if job.fit_score is not none %}
+            <span class="score {{ job.verdict }}" title="{{ job.verdict }}">{{ job.fit_score }}</span>
+          {% else %}
+            <span class="score none" title="not scored yet">—</span>
+          {% endif %}
+        </td>
+        <td>
+          <a class="job-title" href="{{ url_for('job_detail', job_id=job.id) }}">{{ job.title }}</a>
+          <div class="meta">
+            {{ job.company }}
+            {% if job.english_sufficient %} · <span class="chip ok">English OK</span>
+            {% elif job.german_level_required and job.german_level_required not in ('not_stated','none','A2') %}
+              · <span class="chip warn">German {{ job.german_level_required }}</span>
+            {% endif %}
+            {% if job.salary_stated %} · <span class="chip">salary stated</span>{% endif %}
+          </div>
+          {% if job.rationale %}<div class="meta">{{ job.rationale }}</div>{% endif %}
+        </td>
+        <td>
+          {{ job.location or "—" }}
+          {% if job.remote %}<span class="chip ok">remote</span>{% endif %}
+          {% if status == 'excluded' and job.stage0_reason %}
+            <div class="meta">{{ job.stage0_reason }}</div>
+          {% endif %}
+        </td>
+        <td>{{ job.posted_human }}</td>
+        <td class="meta">{{ job.seen_human }}<br>{{ (job.first_seen_at or '')[:10] }}</td>
+        <td><span class="chip mute">{{ job.source_name }}</span></td>
+        <td style="white-space:nowrap">
+          {% if job.status == 'new' %}
+          {% set back = url_for('dashboard', status=status, sort=sort,
+                                day=window.day, days=window.days) %}
+          <form method="post" action="{{ url_for('set_job_status', job_id=job.id) }}" style="display:inline">
+            <input type="hidden" name="status" value="shortlisted">
+            <input type="hidden" name="next" value="{{ back }}">
+            <button class="small" type="submit">Shortlist</button>
+          </form>
+          <form method="post" action="{{ url_for('set_job_status', job_id=job.id) }}" style="display:inline">
+            <input type="hidden" name="status" value="dismissed">
+            <input type="hidden" name="next" value="{{ back }}">
+            <button class="ghost" type="submit">Dismiss</button>
+          </form>
+          {% else %}
+          <span class="chip {% if job.status=='shortlisted' %}ok{% else %}mute{% endif %}">{{ job.status }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">
+    {% if window.label %}
+      Nothing {{ window.label }} with this status.
+      <a href="{{ url_for('dashboard', status=status, sort=sort) }}">Show every day</a>.
+    {% elif status == 'new' %}
+      Nothing awaiting triage. Hit <b>Fetch now</b> to pull from the enabled sources.
+    {% else %}
+      No postings with this status yet.
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

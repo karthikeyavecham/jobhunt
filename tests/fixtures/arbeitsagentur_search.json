@@ -1,0 +1,429 @@
+{
+  "ergebnisliste" : [ {
+    "stellenangebotsart" : "ARBEIT",
+    "stellenangebotsTitel" : "Operations Manager (w/m/d)",
+    "quereinstiegGeeignet" : false,
+    "arbeitszeitSchichtNachtWochenende" : false,
+    "arbeitszeitTeilzeitAbend" : false,
+    "arbeitszeitTeilzeitNachmittag" : false,
+    "arbeitszeitTeilzeitVormittag" : false,
+    "arbeitszeitTeilzeitFlexibel" : false,
+    "arbeitszeitVollzeit" : true,
+    "eintrittszeitraum" : {
+      "von" : "2026-07-15"
+    },
+    "verguetungsangabe" : "KEINE_ANGABEN",
+    "vertragsdauer" : "UNBEFRISTET",
+    "istGeringfuegigeBeschaeftigung" : false,
+    "stellenlokationen" : [ {
+      "adresse" : {
+        "plz" : "53332",
+        "ort" : "Bornheim, Rheinland",
+        "region" : "NORDRHEIN_WESTFALEN",
+        "land" : "DEUTSCHLAND"
+      },
+      "breite" : 50.7730137,
+      "laenge" : 6.9549792
+    } ],
+    "homeofficemoeglich" : false,
+    "chiffrenummer" : "4805",
+    "veroeffentlichungszeitraum" : {
+      "von" : "2026-06-10"
+    },
+    "datumErsteVeroeffentlichung" : "2026-06-10",
+    "aenderungsdatum" : "2026-07-15T10:34:33.662",
+    "hauptberuf" : "Operations Manager/in",
+    "alternativBeruf1" : "Projektassistent/in",
+    "firma" : "General Logistics Systems Germany GmbH & Co. OHG",
+    "arbeitgeberKundennummerHash" : "h2NKbl3MdyA_No84sESFp-fZX-fliUQ25KGveqAizPE=",
+    "referenznummer" : "15863-950954200-S",
+    "entfernung" : 20,
+    "alleBerufe" : [ "Operations Manager/in", "Projektassistent/in" ]
+  }, {
+    "stellenangebotsart" : "ARBEIT",
+    "stellenangebotsTitel" : "Project Manager Marketplace Operations (m/w/d)",
+    "quereinstiegGeeignet" : false,
+    "arbeitszeitSchichtNachtWochenende" : false,
+    "arbeitszeitTeilzeitAbend" : false,
+    "arbeitszeitTeilzeitNachmittag" : false,
+    "arbeitszeitTeilzeitVormittag" : false,
+    "arbeitszeitTeilzeitFlexibel" : false,
+    "arbeitszeitVollzeit" : true,
+    "eintrittszeitraum" : {
+      "von" : "2026-01-27"
+    },
+    "verguetungsangabe" : "KEINE_ANGABEN",
+    "vertragsdauer" : "UNBEFRISTET",
+    "istGeringfuegigeBeschaeftigung" : false,
+    "stellenlokationen" : [ {
+      "adresse" : {
+        "strasse" : "Am Kabellager 5",
+        "plz" : "51063",
+        "ort" : "Köln",
+        "region" : "NORDRHEIN_WESTFALEN",
+        "land" : "DEUTSCHLAND"
+      },
+      "breite" : 50.968089,
+      "laenge" : 7.01046
+    } ],
+    "veroeffentlichungszeitraum" : {
+      "von" : "2026-01-27"
+    },
+    "datumErsteVeroeffentlichung" : "2026-01-27",
+    "aenderungsdatum" : "2026-01-27T13:54:57.032",
+    "hauptberuf" : "Fachkinderkrankenschwester/-pfleger - Operationsdienst",
+    "firma" : "CANCOM SE",
+    "arbeitgeberKundennummerHash" : "MaqtmzMWBSTZMwIPPVr1PWQ3LHB7vF1NhXthhvHVjnU=",
+    "referenznummer" : "18935-2113607-S",
+    "entfernung" : 3,
+    "alleBerufe" : [ "Fachkinderkrankenschwester/-pfleger - Operationsdienst" ]
+  }, {
+    "stellenangebotsart" : "ARBEIT",
+    "stellenangebotsTitel" : "E- Bikes Operations Manager (m,w,d)",
+    "arbeitszeitVollzeit" : true,
+    "eintrittszeitraum" : {
+      "von" : "2026-05-08"
+    },
+    "verguetungsangabe" : "KEINE_ANGABEN",
+    "vertragsdauer" : "UNBEFRISTET",
+    "stellenlokationen" : [ {
+      "adresse" : {
+        "ort" : "Düsseldorf",
+        "region" : "NORDRHEIN_WESTFALEN",
+        "land" : "DEUTSCHLAND"
+      },
+      "breite" : 51.238303536,
+      "laenge" : 6.817272364
+    } ],
+    "veroeffentlichungszeitraum" : {
+      "von" : "2026-05-08"
+    },
+    "datumErsteVeroeffentlichung" : "2026-01-28",
+    "aenderungsdatum" : "2026-05-08T10:46:42.084",
+    "hauptberuf" : "Operations Manager/in",
+    "alternativBeruf1" : "Bereichsleiter/in",
+    "alternativBeruf2" : "Gruppen-, Teamleiter/in",
+    "firma" : "Personalbüro U. Herrmann",
+    "arbeitgeberKundennummerHash" : "iYDeSjFXkECP-4P0JB5FMAnV0UWm2WMfA6Ft7CBDrpE=",
+    "referenznummer" : "10001-1002498046-S",
+    "entfernung" : 34,
+    "alleBerufe" : [ "Operations Manager/in", "Bereichsleiter/in", "Gruppen-, Teamleiter/in" ]
+  }, {
+    "stellenangebotsart" : "ARBEIT",
+    "stellenangebotsTitel" : "Sales Operations Assistant (m/w/d)",
+    "arbeitszeitSchichtNachtWochenende" : false,
+    "arbeitszeitTeilzeitAbend" : false,
+    "arbeitszeitTeilzeitNachmittag" : false,
+    "arbeitszeitTeilzeitVormittag" : false,
+    "arbeitszeitTeilzeitFlexibel" : false,
+    "arbeitszeitVollzeit" : true,
+    "eintrittszeitraum" : {
+      "von" : "2026-08-05"
+    },
+    "verguetungsangabe" : "KEINE_ANGABEN",
+    "vertragsdauer" : "UNBEFRISTET",
+    "stellenlokationen" : [ {
+      "adresse" : {
+        "ort" : "Langenfeld (Rheinland)",
+        "region" : "NORDRHEIN_WESTFALEN",
+        "land" : "DEUTSCHLAND"
+      },
+      "breite" : 51.1110043,
+      "laenge" : 6.9588718
+    } ],
+    "veroeffentlichungszeitraum" : {
+      "von" : "2026-04-02"
+    },
+    "datumErsteVeroeffentlichung" : "2026-04-02",
+    "aenderungsdatum" : "2026-08-05T13:13:52.118",
+    "hauptberuf" : "Operations Manager/in",
+    "alternativBeruf1" : "Vertriebsassistent/in",
+    "alternativBeruf2" : "Fachkaufmann/-frau - Vertrieb",
+    "firma" : "Aschert & Bohrmann GmbH",
+    "arbeitgeberKundennummerHash" : "vC4ZpZ7AYtMaeR5tVw94XkMXmRrFOf8J-fkhd1Y1Y2I=",
+    "referenznummer" : "10001-1002872501-S",
+    "entfernung" : 18,
+    "alleBerufe" : [ "Operations Manager/in", "Vertriebsassistent/in", "Fachkaufmann/-frau - Vertrieb" ]
+  }, {
+    "stellenangebotsart" : "ARBEIT",
+    "stellenangebotsTitel" : "System Specialist Operations (m/w/d)",
+    "quereinstiegGeeignet" : false,
+    "arbeitszeitSchichtNachtWochenende" : false,
+    "arbeitszeitTeilzeitAbend" : false,
+    "arbeitszeitTeilzeitNachmittag" : false,
+    "arbeitszeitTeilzeitVormittag" : false,
+    "arbeitszeitTeilzeitFlexibel" : false,
+    "arbeitszeitVollzeit" : true,
+    "eintrittszeitraum" : {
+      "von" : "2026-06-01"
+    },
+    "verguetungsangabe" : "KEINE_ANGABEN",
+    "vertragsdauer" : "UNBEFRISTET",
+    "istGeringfuegigeBeschaeftigung" : false,
+    "stellenlokationen" : [ {
+      "adresse" : {
+        "plz" : "40210",
+        "ort" : "Düsseldorf",
+        "region" : "NORDRHEIN_WESTFALEN",
+        "land" : "DEUTSCHLAND"
+      },
+      "breite" : 51.2216412,
+      "laenge" : 6.7887514
+    } ],
+    "homeofficemoeglich" : false,
+    "chiffrenummer" : "277114",
+    "veroeffentlichungszeitraum" : {
+      "von" : "2026-05-23"
+    },
+    "datumErsteVeroeffentlichung" : "2026-05-23",
+    "aenderungsdatum" : "2026-05-22T15:27:52.055",
+    "hauptberuf" : "Operations Manager/in",
+    "firma" : "Vodafone GmbH",
+    "arbeitgeberKundennummerHash" : "pPZlw8EZ65ppyiZl59cg2n3kg_MWuoy7ZxZwy2eAqT0=",
+    "referenznummer" : "17102-44193034-522-S",
+    "entfernung" : 33,
+    "alleBerufe" : [ "Operations Manager/in" ]
+  } ],
+  "maxErgebnisse" : 19,
+  "page" : 1,
+  "size" : 5,
+  "woOutput" : {
+    "bereinigterOrt" : "Köln",
+    "suchmodus" : "UMKREISSUCHE",
+    "koordinaten" : [ {
+      "lat" : 50.9514309,
+      "lon" : 6.969884
+    } ]
+  },
+  "facetten" : {
+    "befristung" : {
+      "counts" : {
+        "2" : 15,
+        "3" : 4
+      },
+      "maxCount" : 19
+    },
+    "externestellenboersen" : {
+      "counts" : {
+        "false" : 19
+      },
+      "maxCount" : 19
+    },
+    "behinderung" : {
+      "counts" : {
+        "false" : 14,
+        "true" : 1
+      },
+      "maxCount" : 19
+    },
+    "berufsfeld" : {
+      "counts" : {
+        "Biologie" : 2,
+        "Büro und Sekretariat" : 2,
+        "Einkauf und Vertrieb" : 1,
+        "IT-Netzwerktechnik, -Administration, -Organisation" : 1,
+        "Informatik" : 1,
+        "Kaufleute - Verkehr und Logistik" : 1,
+        "Krankenpflege, Rettungsdienst und Geburtshilfe" : 1,
+        "Rechnungswesen, Controlling und Revision" : 1,
+        "Steuerberatung" : 3,
+        "Unternehmensorganisation und -strategie" : 6
+      },
+      "maxCount" : 19
+    },
+    "pav" : {
+      "counts" : {
+        "false" : 17,
+        "true" : 2
+      },
+      "maxCount" : 19
+    },
+    "topberuf" : {
+      "counts" : {
+        "Operations Manager/in" : 4,
+        "Steuerberater/in" : 3
+      },
+      "scores" : {
+        "Operations Manager/in" : 2641265,
+        "Steuerberater/in" : 136691
+      },
+      "maxCount" : 19
+    },
+    "arbeitsort" : {
+      "counts" : {
+        "Bonn" : 1,
+        "Düsseldorf" : 10,
+        "Hilden" : 3,
+        "Köln" : 5,
+        "Bornheim, Rheinland" : 1
+      },
+      "maxCount" : 19
+    },
+    "veroeffentlichtseit" : {
+      "counts" : {
+        "0" : 1,
+        "1" : 1,
+        "14" : 5,
+        "28" : 6,
+        "7" : 2,
+        "alle" : 19
+      },
+      "maxCount" : 19
+    },
+    "arbeitsort_plz" : {
+      "counts" : {
+        "10117" : 2,
+        "20148" : 1,
+        "20457" : 1,
+        "38440" : 1,
+        "40210" : 2,
+        "40213" : 3,
+        "40221" : 1,
+        "40235" : 1,
+        "40545" : 1,
+        "40724" : 3,
+        "50667" : 2,
+        "50672" : 1,
+        "51063" : 1,
+        "51103" : 1,
+        "53179" : 1,
+        "53332" : 1,
+        "60487" : 1,
+        "65760" : 3,
+        "70567" : 1,
+        "70629" : 1,
+        "76275" : 1,
+        "80636" : 1,
+        "80807" : 1,
+        "83026" : 1,
+        "99091" : 1
+      },
+      "maxCount" : 19
+    },
+    "arbeitgeber" : {
+      "counts" : {
+        "Agraya GmbH" : 1,
+        "Aschert & Bohrmann GmbH" : 1,
+        "CANCOM SE" : 1,
+        "EY Strategy & Transactions GmbH" : 1,
+        "EY Tax GmbH Steuerberatungsgesellschaft" : 2,
+        "General Logistics Systems Germany GmbH & Co. OHG" : 1,
+        "Grohe AG" : 1,
+        "Hays Professional Solutions GmbH" : 1,
+        "JeyMo-Agency GmbH" : 1,
+        "METRO Deutschland GmbH" : 1,
+        "NTT DATA Deutschland SE" : 1,
+        "Personalbüro U. Herrmann" : 1,
+        "QIAGEN GmbH" : 3,
+        "Vodafone GmbH" : 2,
+        "metas GmbH" : 1
+      },
+      "maxCount" : 19
+    },
+    "beruf" : {
+      "counts" : {
+        "Application-Engineer/-Manager/in" : 1,
+        "Bereichsleiter/in" : 1,
+        "Betriebswirt/in (Hochschule)" : 2,
+        "Betriebswirt/in (Hochschule) - Logistik" : 1,
+        "Betriebswirt/in (Hochschule) - Steuern und Prüfungswesen" : 2,
+        "Bilanzbuchhalter/in/Bachelor Professional in Bilanzbuchhaltung" : 1,
+        "Biowissenschaftler/in" : 1,
+        "Business-Unit Leiter/in" : 1,
+        "Fachkaufmann/-frau - Vertrieb" : 1,
+        "Fachkinderkrankenschwester/-pfleger - Operationsdienst" : 1,
+        "Gruppen-, Teamleiter/in" : 1,
+        "IT-Projektkoordinator/in" : 1,
+        "Informatiker/in" : 1,
+        "KI-Manager/in" : 1,
+        "Kaufmann/-frau - Büromanagement" : 1,
+        "Leiter/in - Marketing Kommunikation" : 1,
+        "Molekularmediziner/in" : 1,
+        "Office-Manager/in" : 1,
+        "Operations Manager/in" : 4,
+        "Projektassistent/in" : 1,
+        "Revisor/in" : 1,
+        "Steuerberater/in" : 3,
+        "Supply-Chain-Manager/in" : 1,
+        "Vertriebsassistent/in" : 1
+      },
+      "maxCount" : 19
+    },
+    "homeoffice" : {
+      "counts" : {
+        "prozentual" : 1,
+        "nv_false" : 1,
+        "nv_true" : 2
+      },
+      "maxCount" : 19
+    },
+    "branche" : {
+      "counts" : {
+        "11" : 3,
+        "13" : 6,
+        "15" : 1,
+        "2" : 3,
+        "21" : 1,
+        "27" : 1,
+        "28" : 3,
+        "9" : 1
+      },
+      "maxCount" : 19
+    },
+    "quereinstieg" : {
+      "counts" : {
+        "false" : 19
+      },
+      "maxCount" : 19
+    },
+    "arbeitszeit" : {
+      "counts" : {
+        "tz" : 1,
+        "vz" : 17
+      },
+      "maxCount" : 19
+    },
+    "eintrittsdatum" : {
+      "counts" : {
+        "10_01_01-now" : 15,
+        "26_08_01-26_09_01" : 7,
+        "26_09_01-26_10_01" : 2
+      },
+      "maxCount" : 19
+    },
+    "zeitarbeit" : {
+      "counts" : {
+        "false" : 17,
+        "true" : 2
+      },
+      "maxCount" : 19
+    },
+    "topberufsfeld" : {
+      "counts" : {
+        "Biologie" : 2,
+        "Unternehmensorganisation und -strategie" : 6,
+        "Steuerberatung" : 3,
+        "Büro und Sekretariat" : 2,
+        "Kaufleute - Verkehr und Logistik" : 1,
+        "IT-Netzwerktechnik, -Administration, -Organisation" : 1,
+        "Informatik" : 1,
+        "Einkauf und Vertrieb" : 1,
+        "Rechnungswesen, Controlling und Revision" : 1,
+        "Krankenpflege, Rettungsdienst und Geburtshilfe" : 1
+      },
+      "scores" : {
+        "Biologie" : 117316,
+        "Unternehmensorganisation und -strategie" : 52879,
+        "Steuerberatung" : 26024,
+        "Büro und Sekretariat" : 3677,
+        "Kaufleute - Verkehr und Logistik" : 2839,
+        "IT-Netzwerktechnik, -Administration, -Organisation" : 2506,
+        "Informatik" : 2122,
+        "Einkauf und Vertrieb" : 1049,
+        "Rechnungswesen, Controlling und Revision" : 951,
+        "Krankenpflege, Rettungsdienst und Geburtshilfe" : 393
+      },
+      "maxCount" : 19
+    }
+  }
+}

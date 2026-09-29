@@ -1,0 +1,46 @@
+{
+  "stellenangebotsart" : "ARBEIT",
+  "stellenangebotsTitel" : "Operations Manager (w/m/d)",
+  "quereinstiegGeeignet" : false,
+  "stellenangebotsBeschreibung" : "**Teamleitung Logistik und Produktion (w/m/d)**\n\nAls **Teamleitung** bei GLS steuerst Du das Herzstück unseres Standortes in Bornheim. In dieser **Schlüsselposition** lernst Du alle Abläufe kennen und entwickelst Dich Schritt für Schritt zur Führungskraft.   \nDu möchtest Verantwortung übernehmen und hast die Vision, Deine Abteilung und Dein Team voranzubringen? Dann werde Teil des **GLS-Teams!**  \n  \nDeine Arbeitszeiten finden von **Montag bis Freitag** statt - das Wochenende gehört Dir.\n\n**Was erwartet Dich?**\n\n- Du tauchst tief ein in spannende Abläufe der **Produktion &amp; Logistik** – praxisnah und mit vollem Support.\n- Nach und nach übernimmst du **Verantwortung** für bis zu **250 Kolleg:innen** – Step by Step, mit viel Coaching.\n- Du packst mit an bei der **Optimierung** von Prozessen, sorgst für Qualität und gestaltest Tourenplanung mit.\n- Du bist **Schnittstelle** zu Logistikpartnern, Technik und Facility Management – immer mittendrin statt nur dabei.\n- Arbeiten bei uns heißt: moderner Arbeitsplatz, kurze Wege, offene Türen und eine **Kultur**, in der deine Ideen zählen.\n\n**Was bringst Du mit?**\n\n- **Abgeschlossene Ausbildung oder Studium** – am besten mit Logistik-, Produktions- oder BWL-Bezug.\n- Du hast **einschlägige Berufserfahrung** in der Logistik, aber deine Einstellung und Persönlichkeit zählen mehr!\n- Du bist **kommunikativ**, organisiert und hast Lust, richtig was zu reißen.\n- **Excel**  &amp; Co. beherrschst du sicher.\n- **Teamplayer**  mit Hands-On-Mentalität und dem Willen, jeden Tag besser zu werden.\n\n**Was hast Du von uns?**\n\n**Impact:** Die Möglichkeit der aktiven Mitgestaltung am GLS-Erfolg sowie Wertschätzung Deiner Arbeit, werden bei uns gelebt.  \n**Herausfordernde Aufgabe:** Bei uns hast Du eine herausfordernde Aufgabe in einem sehr dynamischen Umfeld mit relevanter Verantwortung für Themen und Projekte.  \n**Mitarbeiterrabatte über Corporate Benefits:** Du erhältst vielseitige Mitarbeiterrabatte bei den verschiedensten Onlineportalen.  \n**Betriebliche Altersvorsorge:** Damit Du auch im Alter gut abgesichert bist, bezuschussen wir Deine Altersvorsorge.  \n**Tolles Team:** Eine offene Unternehmenskultur ist uns wichtig. Deshalb wartet auf Dich ein engagiertes Team, das Dich herzlich aufnimmt und Dir hilfsbereit zur Seite steht.  \n**Verpflegung:** Du bist gut versorgt mit gratis Wasser und Kaffee.  \n**Mitarbeiter werben Mitarbeiter:** Profitiere von unserem 'Mitarbeiter werben Mitarbeiter'-Programm und sichere Dir attraktive Zusatzzahlungen für jede erfolgreiche Empfehlung.  \n**Sicherheit:** Eine zukunftssichere Branche, die von Wachstum geprägt ist.\n\n**Interesse?**\n\nDann mach direkt den ersten Schritt und bewirb Dich bevorzugt über den Bewerben-Button. Profitiere von unseren vielfältigen Karrieremöglichkeiten. Wir freuen uns auf Dich und sind gut vorbereitet!  \n  \nSchwerbehinderte Menschen werden bei gleicher Eignung bevorzugt eingestellt.\n\n**Fragen?**\n\nWende Dich sich gerne an Lea Bührer unter 06677 646 55347.\n\nGeneral Logistics Systems Germany GmbH &amp; Co. OHG - Regionen  \nNatalie Marx  \nGLS Germany-Straße 1-7  \n36286 Neuenstein  \nD: 06677646-55332  \nT: 06677646-55332  \nnatalie.marx@gls-germany.com",
+  "arbeitszeitSchichtNachtWochenende" : false,
+  "arbeitszeitTeilzeitAbend" : false,
+  "arbeitszeitTeilzeitNachmittag" : false,
+  "arbeitszeitTeilzeitVormittag" : false,
+  "arbeitszeitTeilzeitFlexibel" : false,
+  "arbeitszeitVollzeit" : true,
+  "eintrittszeitraum" : {
+    "von" : "2026-07-15"
+  },
+  "verguetungsangabe" : "KEINE_ANGABEN",
+  "vertragsdauer" : "UNBEFRISTET",
+  "istGeringfuegigeBeschaeftigung" : false,
+  "istBehinderungGefordert" : false,
+  "stellenlokationen" : [ {
+    "adresse" : {
+      "plz" : "53332",
+      "ort" : "Bornheim, Rheinland",
+      "region" : "NORDRHEIN_WESTFALEN",
+      "land" : "DEUTSCHLAND"
+    },
+    "breite" : 50.7730137,
+    "laenge" : 6.9549792
+  } ],
+  "homeofficemoeglich" : false,
+  "chiffrenummer" : "4805",
+  "istPrivateArbeitsvermittlung" : false,
+  "istArbeitnehmerUeberlassung" : false,
+  "veroeffentlichungszeitraum" : {
+    "von" : "2026-06-10"
+  },
+  "datumErsteVeroeffentlichung" : "2026-06-10",
+  "aenderungsdatum" : "2026-07-15T10:34:33.662",
+  "istBetreut" : true,
+  "hauptberuf" : "Operations Manager/in",
+  "alternativBeruf1" : "Projektassistent/in",
+  "firma" : "General Logistics Systems Germany GmbH & Co. OHG",
+  "arbeitgeberKundennummerHash" : "h2NKbl3MdyA_No84sESFp-fZX-fliUQ25KGveqAizPE=",
+  "allianzpartnerUrl" : "www.gls-karriere.de",
+  "allianzpartnerName" : "General Logistics Systems Germany GmbH & Co.",
+  "referenznummer" : "15863-950954200-S"
+}

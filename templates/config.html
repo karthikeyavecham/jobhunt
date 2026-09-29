@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% block title %}JobHunt — Configuration{% endblock %}
+{% block subtitle %}Schedule, models, Slack, and the job titles being searched{% endblock %}
+
+{% block content %}
+
+<div class="tabs">
+  <a class="tab active" href="{{ url_for('config_page') }}">Configuration</a>
+  <a class="tab" href="{{ url_for('prompts_page') }}">Writing prompts</a>
+</div>
+
+<section class="panel">
+  <h2>Schedule</h2>
+  <div class="meta" style="margin-bottom:12px">
+    Fetching and scoring run around the clock so nothing is missed overnight.
+    Only <b>notifications</b> are held outside the window below.
+  </div>
+  <form method="post" action="{{ url_for('save_config') }}">
+    <input type="hidden" name="section" value="schedule">
+    <div class="kv">
+      <div>
+        <label for="schedule_enabled">Scheduler</label>
+        <select id="schedule_enabled" name="schedule.enabled">
+          <option value="1" {% if s['schedule.enabled'] %}selected{% endif %}>Enabled</option>
+          <option value="0" {% if not s['schedule.enabled'] %}selected{% endif %}>Paused</option>
+        </select>
+      </div>
+      <div>
+        <label for="interval">Run every (hours)</label>
+        <input id="interval" name="schedule.interval_hours" type="number" min="1" max="24"
+               value="{{ s['schedule.interval_hours'] }}">
+      </div>
+      <div>
+        <label for="tz">Timezone</label>
+        <input id="tz" name="schedule.timezone" value="{{ s['schedule.timezone'] }}">
+      </div>
+      <div>
+        <label for="nfrom">Notify from</label>
+        <input id="nfrom" name="slack.notify_from" value="{{ s['slack.notify_from'] }}">
+      </div>
+      <div>
+        <label for="nuntil">Notify until</label>
+        <input id="nuntil" name="slack.notify_until" value="{{ s['slack.notify_until'] }}">
+      </div>
+      <div>
+        <label for="report">Daily report at</label>
+        <input id="report" name="schedule.report_at" value="{{ s['schedule.report_at'] }}">
+      </div>
+    </div>
+    <div style="margin-top:14px"><button type="submit">Save schedule</button></div>
+  </form>
+
+  {% if jobs %}
+  <div class="meta" style="margin-top:16px">
+    <b>Next runs</b><br>
+    {% for j in jobs %}{{ j.name }} — {{ j.next_run or "not scheduled" }}<br>{% endfor %}
+  </div>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <h2>Language model</h2>
+  <div class="meta" style="margin-bottom:12px">
+    The local model is tried first. If it cannot be reached after the configured
+    number of attempts — the usual cause is the Mac being asleep — the app falls
+    back to Claude so the schedule still produces scores.
+  </div>
+  <form method="post" action="{{ url_for('save_config') }}">
+    <input type="hidden" name="section" value="llm">
+    <div class="kv">
+      <div>
+        <label for="base_url">Local endpoint</label>
+        <input id="base_url" name="llm.local.base_url" value="{{ s['llm.local.base_url'] }}">
+      </div>
+      <div>
+        <label for="local_model">Local model</label>
+        <input id="local_model" name="llm.local.model" value="{{ s['llm.local.model'] }}">
+      </div>
+      <div>
+        <label for="attempts">Connection attempts before fallback</label>
+        <input id="attempts" name="llm.local.attempts" type="number" min="1" max="20"
+               value="{{ s['llm.local.attempts'] }}">
+      </div>
+      <div>
+        <label for="fallback">Claude fallback</label>
+        <select id="fallback" name="llm.fallback.enabled">
+          <option value="1" {% if s['llm.fallback.enabled'] %}selected{% endif %}>Enabled</option>
+          <option value="0" {% if not s['llm.fallback.enabled'] %}selected{% endif %}>Disabled</option>
+        </select>
+      </div>
+      <div>
+        <label for="cmodel">Claude model (fallback)</label>
+        <select id="cmodel" name="llm.anthropic.model">
+          {% for model_id, label in anthropic_models %}
+          <option value="{{ model_id }}" {% if s['llm.anthropic.model']==model_id %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:14px"><button type="submit">Save model settings</button></div>
+  </form>
+
+  <div style="margin-top:20px; padding-top:16px; border-top:1px dashed var(--border)">
+    <div class="k" style="margin-bottom:10px">Scoring throughput</div>
+    <form method="post" action="{{ url_for('save_config') }}">
+      <input type="hidden" name="section" value="scoring">
+      <div class="kv">
+        <div>
+          <label for="scoring_enabled">Scoring</label>
+          <select id="scoring_enabled" name="scoring.enabled">
+            <option value="1" {% if s['scoring.enabled'] %}selected{% endif %}>Enabled</option>
+            <option value="0" {% if not s['scoring.enabled'] %}selected{% endif %}>Paused</option>
+          </select>
+        </div>
+        <div>
+          <label for="batch_limit">Jobs scored per scheduled cycle</label>
+          <input id="batch_limit" name="scoring.batch_limit" type="number"
+                 min="1" max="2000" value="{{ s['scoring.batch_limit'] }}">
+        </div>
+        <div>
+          <label for="concurrency">Jobs scored in parallel</label>
+          <input id="concurrency" name="scoring.concurrency" type="number"
+                 min="1" max="8" value="{{ s['scoring.concurrency'] }}">
+        </div>
+      </div>
+      <div class="meta" style="margin-top:10px">
+        LM Studio batches concurrent requests, so parallel scoring is a real
+        gain rather than just queueing. Measured on <code>qwen3.8-27b</code>,
+        scoring the same postings:
+        <table style="margin-top:8px; max-width:520px">
+          <thead><tr><th>In parallel</th><th>Throughput</th><th>Per request</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>2.2 jobs/min</td><td>27s</td></tr>
+            <tr><td>2</td><td>3.9 jobs/min</td><td>31s</td></tr>
+            <tr><td>4</td><td>5.1 jobs/min</td><td>37s</td></tr>
+            <tr><td>8</td><td>6.1 jobs/min</td><td>53s</td></tr>
+          </tbody>
+        </table>
+        <b>3 or 4 is the sweet spot.</b> The big win is going above 1; past 4
+        throughput flattens while each request keeps slowing down, and the Mac
+        is busier the whole time. Raise it to drain a backlog, lower it when
+        you need the machine.
+      </div>
+      <div style="margin-top:14px"><button type="submit">Save scoring settings</button></div>
+    </form>
+  </div>
+
+  <div style="margin-top:20px; padding-top:16px; border-top:1px dashed var(--border)">
+    <div class="k">Anthropic API key</div>
+    <div class="v" style="margin-bottom:10px">
+      {% if secrets['anthropic.api_key'].is_set %}
+        <span class="chip ok">set</span>
+        <code>{{ secrets['anthropic.api_key'].masked }}</code>
+        <span class="meta">— {{ secrets['anthropic.api_key'].source }}</span>
+      {% else %}
+        <span class="chip mute">not set</span>
+        <span class="meta">— the Claude fallback is inactive without it</span>
+      {% endif %}
+    </div>
+    <form method="post" action="{{ url_for('save_secret') }}">
+      <input type="hidden" name="key" value="anthropic.api_key">
+      <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap">
+        <div style="flex:1; min-width:280px">
+          <label for="anthropic_key">Paste a key to replace it (leave blank to keep)</label>
+          <input id="anthropic_key" name="value" type="password" autocomplete="off"
+                 placeholder="sk-ant-...">
+        </div>
+        <button type="submit">Save key</button>
+      </div>
+    </form>
+    <div class="meta" style="margin-top:8px">
+      An <code>ANTHROPIC_API_KEY</code> environment variable always wins over a stored
+      key, so the Pi's service file can hold it without it entering the database.
+      Stored keys are never rendered back into this form.
+    </div>
+  </div>
+
+  <div style="margin-top:16px">
+    <form method="post" action="{{ url_for('test_provider') }}">
+      <button class="small" type="submit">Test connection</button>
+    </form>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Slack</h2>
+  <form method="post" action="{{ url_for('save_config') }}">
+    <input type="hidden" name="section" value="slack">
+    <div class="kv">
+      <div>
+        <label for="slack_enabled">Notifications</label>
+        <select id="slack_enabled" name="slack.enabled">
+          <option value="1" {% if s['slack.enabled'] %}selected{% endif %}>Enabled</option>
+          <option value="0" {% if not s['slack.enabled'] %}selected{% endif %}>Disabled</option>
+        </select>
+      </div>
+      <div>
+        <label for="channel">Channel ID</label>
+        <input id="channel" name="slack.channel_id" value="{{ s['slack.channel_id'] }}">
+      </div>
+      <div>
+        <label for="threshold">Score threshold for a card</label>
+        <input id="threshold" name="slack.score_threshold" type="number" min="0" max="100"
+               value="{{ s['slack.score_threshold'] }}">
+      </div>
+      <div>
+        <label for="maxcards">Max cards per run</label>
+        <input id="maxcards" name="slack.max_cards_per_run" type="number" min="1" max="50"
+               value="{{ s['slack.max_cards_per_run'] }}">
+      </div>
+      <div>
+        <label for="allowed">Allowed user IDs (comma separated)</label>
+        <input id="allowed" name="slack.allowed_user_ids"
+               value="{{ s['slack.allowed_user_ids']|join(', ') }}">
+      </div>
+    </div>
+    <div style="margin-top:14px"><button type="submit">Save Slack settings</button></div>
+  </form>
+  <div class="meta" style="margin-top:10px">
+    Only the listed users may trigger actions. An empty list permits nobody.
+    Tokens are set with
+    <code>python -m jobhunt.scripts.set_secret slack.bot_token</code>.
+    Bot token: <span class="chip {% if secrets['slack.bot_token'].is_set %}ok{% else %}mute{% endif %}">
+      {{ secrets['slack.bot_token'].masked or "not set" }}</span>
+    App token: <span class="chip {% if secrets['slack.app_token'].is_set %}ok{% else %}mute{% endif %}">
+      {{ secrets['slack.app_token'].masked or "not set" }}</span>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Job titles</h2>
+  <div class="meta" style="margin-bottom:12px">
+    These drive the Arbeitsagentur search directly. Adding one affects the next run —
+    use <b>Backfill</b> to also re-check postings already stored.
+  </div>
+  <table>
+    <thead><tr><th>Title</th><th>Scope</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for term in terms %}
+      <tr>
+        <td>{{ term.term }}</td>
+        <td><span class="chip mute">{{ term.match_scope }}</span></td>
+        <td>{% if term.enabled %}<span class="chip ok">enabled</span>
+            {% else %}<span class="chip mute">disabled</span>{% endif %}</td>
+        <td style="white-space:nowrap">
+          <form method="post" action="{{ url_for('toggle_term', term_id=term.id) }}" style="display:inline">
+            <button class="small" type="submit">{{ "Disable" if term.enabled else "Enable" }}</button>
+          </form>
+          <form method="post" action="{{ url_for('delete_term', term_id=term.id) }}" style="display:inline">
+            <button class="ghost" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <form method="post" action="{{ url_for('add_term') }}" style="margin-top:14px">
+    <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap">
+      <div style="flex:1; min-width:260px">
+        <label for="term">Add a job title</label>
+        <input id="term" name="term" placeholder="e.g. Head of Customer Support" required>
+      </div>
+      <div>
+        <label for="scope">Match on</label>
+        <select id="scope" name="match_scope">
+          <option value="title">Title only</option>
+          <option value="title_and_body">Title and description</option>
+        </select>
+      </div>
+      <button type="submit">Add</button>
+    </div>
+  </form>
+  <form method="post" action="{{ url_for('backfill_filters') }}" style="margin-top:12px">
+    <button class="small" type="submit">Backfill — re-check stored postings</button>
+  </form>
+</section>
+
+<section class="panel">
+  <h2>Region filter</h2>
+  <form method="post" action="{{ url_for('save_config') }}">
+    <input type="hidden" name="section" value="filter">
+    <div class="kv">
+      <div>
+        <label for="allow_remote">Remote roles</label>
+        <select id="allow_remote" name="filter.allow_remote">
+          <option value="1" {% if s['filter.allow_remote'] %}selected{% endif %}>Include</option>
+          <option value="0" {% if not s['filter.allow_remote'] %}selected{% endif %}>Exclude</option>
+        </select>
+      </div>
+      <div>
+        <label for="allow_relocation">On-site roles elsewhere in Germany</label>
+        <select id="allow_relocation" name="filter.allow_relocation">
+          <option value="1" {% if s['filter.allow_relocation'] %}selected{% endif %}>Include — open to relocating</option>
+          <option value="0" {% if not s['filter.allow_relocation'] %}selected{% endif %}>Exclude — commutable or remote only</option>
+        </select>
+      </div>
+      <div>
+        <label for="maxage">Max posting age (days, 0 = no limit)</label>
+        <input id="maxage" name="filter.max_age_days" type="number" min="0" max="365"
+               value="{{ s['filter.max_age_days'] }}">
+      </div>
+      <div style="grid-column: 1 / -1">
+        <label for="blocklist">Company blocklist (comma separated)</label>
+        <input id="blocklist" name="filter.company_blocklist"
+               value="{{ s['filter.company_blocklist']|join(', ') }}">
+      </div>
+    </div>
+    <div style="margin-top:14px"><button type="submit">Save filter</button></div>
+  </form>
+</section>
+
+{% endblock %}

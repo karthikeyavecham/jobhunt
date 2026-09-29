@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}JobHunt — Profile{% endblock %}
+{% block subtitle %}Who the app is job-hunting for{% endblock %}
+
+{% block content %}
+
+{% if is_placeholder %}
+<section class="panel" style="border-left:4px solid var(--amber)">
+  <h2>Start here</h2>
+  <div class="meta">
+    This is still the example profile that ships with the app. Scoring will
+    compare postings against placeholder text, and any CV generated now will
+    carry placeholder contact details. Fill in the sections below — the contact
+    block and the career summary are the two that matter most.
+  </div>
+</section>
+{% endif %}
+
+<section class="panel">
+  <h2>Contact details</h2>
+  <div class="meta" style="margin-bottom:12px">
+    Printed verbatim at the top of every CV. The model is never shown these and
+    never writes them, so it cannot invent a phone number or an email address.
+  </div>
+  <form method="post" action="{{ url_for('save_profile') }}">
+    <input type="hidden" name="section" value="contact">
+    <div class="kv">
+      {% for field in contact_fields %}
+      <div>
+        <label for="{{ field }}">{{ field|replace('_', ' ')|title }}</label>
+        <input id="{{ field }}" name="{{ field }}" value="{{ contact.get(field, '') }}"
+               autocomplete="off">
+      </div>
+      {% endfor %}
+    </div>
+    <div style="margin-top:14px"><button type="submit">Save contact details</button></div>
+  </form>
+</section>
+
+{% for key, label, hint, value in sections %}
+<section class="panel">
+  <h2>{{ label }}</h2>
+  <div class="meta" style="margin-bottom:10px">{{ hint }}</div>
+  <form method="post" action="{{ url_for('save_profile') }}">
+    <input type="hidden" name="section" value="{{ key }}">
+    <textarea name="{{ key }}" rows="{{ 3 if key == 'languages' else 14 }}"
+              spellcheck="false"
+              style="width:100%; font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+                     font-size:12.5px; line-height:1.55; padding:10px">{{ value }}</textarea>
+    <div class="toolbar" style="margin-top:10px">
+      <button type="submit">Save</button>
+      <span class="sub" style="margin:0">{{ value|length }} characters</span>
+    </div>
+  </form>
+</section>
+{% endfor %}
+
+<section class="panel">
+  <h2>Seeding a fresh install</h2>
+  <div class="meta">
+    A new install starts from the placeholder profile. To skip the typing, copy
+    <code>profile.example.json</code> to <code>profile_local.json</code> beside
+    the app and fill that in instead — it is read once, on first run, and is
+    gitignored so a personal profile never reaches the repository. Whatever is
+    saved on this page always wins over both.
+  </div>
+</section>
+
+{% endblock %}

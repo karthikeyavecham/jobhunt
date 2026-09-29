@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}JobHunt — Import a posting{% endblock %}
+{% block subtitle %}Add a role you found somewhere the app cannot fetch{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <h2>Import a job posting</h2>
+  <div class="meta" style="margin-bottom:14px">
+    Paste a URL and it will be fetched, or paste the posting text directly.
+    Either way an LLM parses it into the same pipeline as every other posting —
+    scored, filterable, and able to generate a CV.
+  </div>
+
+  <form method="post" action="{{ url_for('manual_import') }}">
+    <div style="margin-bottom:14px">
+      <label for="url">Posting URL</label>
+      <input id="url" name="url" placeholder="https://…" autocomplete="off">
+    </div>
+    <div style="margin-bottom:12px">
+      <label for="text">…or paste the posting text</label>
+      <textarea id="text" name="text" rows="12"
+                placeholder="Paste the whole posting — title, company, responsibilities, requirements."></textarea>
+    </div>
+    <button type="submit">Import and score</button>
+  </form>
+
+  <div class="meta" style="margin-top:16px; padding-top:14px; border-top:1px dashed var(--border)">
+    <b>These sites need the text pasted rather than a URL:</b><br>
+    {% for host in blocked %}<span class="chip mute" style="margin:2px 3px 2px 0">{{ host }}</span>{% endfor %}
+    <div style="margin-top:8px">
+      Their terms forbid automated fetching, and they block it in practice. Opening
+      the posting and copying the text works exactly as well — and avoids putting
+      your LinkedIn account at risk, which is the account you actually need right now.
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>What happens next</h2>
+  <ul class="tight">
+    <li>The posting is parsed into title, company, location and description.</li>
+    <li>It is scored immediately rather than waiting for the next 3-hour cycle.</li>
+    <li>It skips the region filter — importing by hand is taken as intent.</li>
+    <li>Re-importing the same URL updates the existing entry instead of duplicating it.</li>
+  </ul>
+</section>
+{% endblock %}

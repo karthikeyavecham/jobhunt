@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}JobHunt — Applications{% endblock %}
+{% block subtitle %}The application pipeline, from shortlisted to offer{% endblock %}
+
+{% block content %}
+
+<div class="cards">
+  {% for stage in pipeline %}
+  <div class="card">
+    <div class="label">{{ stage }}</div>
+    <div class="value">{{ counts.get(stage, 0) }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if due %}
+<section class="panel" style="border-left:4px solid var(--amber)">
+  <h2>Due now</h2>
+  <table>
+    <tbody>
+      {% for row in due %}
+      <tr>
+        <td><a class="job-title" href="{{ url_for('job_detail', job_id=row.job_id) }}">{{ row.company }}</a>
+            <div class="meta">{{ row.title[:64] }}</div></td>
+        <td>{{ row.next_action or "follow up" }}</td>
+        <td><span class="chip warn">{{ row.next_action_date }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+{% if stale %}
+<section class="panel">
+  <h2>Shortlisted but not applied to</h2>
+  <div class="meta" style="margin-bottom:8px">Sitting more than a week without an application.</div>
+  <table>
+    <tbody>
+      {% for row in stale %}
+      <tr>
+        <td><a class="job-title" href="{{ url_for('job_detail', job_id=row.job_id) }}">{{ row.company }}</a>
+            <div class="meta">{{ row.title[:64] }}</div></td>
+        <td class="meta">shortlisted {{ row.shortlisted_at[:10] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+<section class="panel" id="all-applications">
+  <h2>All applications</h2>
+  <div style="display:flex; gap:18px; align-items:flex-end; flex-wrap:wrap; margin-bottom:14px">
+    <div>
+      <label for="sort">Sort by</label>
+      <select id="sort" name="sort" style="width:auto"
+              onchange="location.href=this.value">
+        {% for key, option in sorts.items() %}
+        <option value="{{ url_for('applications_page', sort=key) }}"
+                {% if sort == key %}selected{% endif %}>{{ option.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="meta">{{ rows|length }} tracked</div>
+  </div>
+  {% if rows %}
+  <table>
+    <thead>
+      <tr>
+        <th style="width:52px">Fit</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Applied</th>
+        <th>Next action</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>{% if row.fit_score is not none %}
+              <span class="score {{ row.verdict }}">{{ row.fit_score }}</span>
+            {% else %}<span class="score none">—</span>{% endif %}</td>
+        <td>
+          <a class="job-title" href="{{ url_for('job_detail', job_id=row.job_id) }}">{{ row.title }}</a>
+          <div class="meta">{{ row.company }}{% if row.location %} · {{ row.location }}{% endif %}</div>
+          {% if row.notes %}<div class="meta">{{ row.notes[:110] }}</div>{% endif %}
+        </td>
+        <td><span class="chip {% if row.pipeline_status in ('offer','interview') %}ok
+                              {% elif row.pipeline_status in ('rejected','withdrawn') %}mute
+                              {% else %}warn{% endif %}">{{ row.pipeline_status }}</span></td>
+        <td class="meta">{{ row.applied_at or "—" }}</td>
+        <td class="meta">
+          {{ row.next_action or "—" }}
+          {% if row.next_action_date %}<br><span class="chip mute">{{ row.next_action_date }}</span>{% endif %}
+        </td>
+        <td style="white-space:nowrap">
+          <form method="post" action="{{ url_for('update_pipeline', job_id=row.job_id) }}">
+            <input type="hidden" name="next" value="{{ url_for('applications_page', sort=sort) }}">
+            <select name="pipeline_status" style="width:auto; font-size:13px; padding:4px 8px">
+              {% for stage in pipeline %}
+              <option value="{{ stage }}" {% if stage == row.pipeline_status %}selected{% endif %}>{{ stage }}</option>
+              {% endfor %}
+            </select>
+            <button class="small" type="submit">Set</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">
+    Nothing tracked yet. Shortlist a job from the dashboard or Slack, or import
+    an existing tracker below.
+  </div>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <h2>Export and import</h2>
+  <div class="toolbar" style="margin-bottom:14px">
+    <a class="tab" href="{{ url_for('export_applications', fmt='xlsx') }}">Download .xlsx</a>
+    <a class="tab" href="{{ url_for('export_applications', fmt='json') }}">Download .json</a>
+    <span class="sub" style="margin:0">The spreadsheet opens in Excel with filters on.</span>
+  </div>
+
+  <form method="post" action="{{ url_for('import_tracker_route') }}"
+        enctype="multipart/form-data">
+    <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap">
+      <div style="flex:1; min-width:280px">
+        <label for="file">Import an existing tracker (.xlsx or .csv)</label>
+        <input id="file" name="file" type="file" accept=".xlsx,.csv">
+      </div>
+      <button type="submit">Import</button>
+    </div>
+  </form>
+  <div class="meta" style="margin-top:8px">
+    Columns are matched on their names, so <code>Company</code>, <code>Role</code>,
+    <code>Status</code>, <code>Applied</code>, <code>Next action</code>,
+    <code>Notes</code> and similar spellings are picked up automatically; anything
+    unrecognised is reported rather than dropped silently. Rows are matched to
+    existing entries by company and role, so re-importing a corrected sheet
+    updates rather than duplicates.
+  </div>
+</section>
+
+{% endblock %}
