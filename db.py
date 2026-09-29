@@ -196,11 +196,11 @@ DEFAULT_SEARCH_TERMS = [
 ]
 
 #: The nationwide Bundesagentur source, added 2026-08-13. A blank `wo` drops
-#: the geographic filter, so this finds remote and relocation roles advertised
-#: anywhere in Germany — which the Köln-centred source cannot return however
-#: wide its radius. Same data as make-it-in-germany.com, which is a translated
-#: front-end over this database and cannot be fetched anyway (robots.txt
-#: disallows its filtered URLs and it sits behind bot protection).
+#: the geographic filter, so this finds remote roles advertised anywhere in
+#: Germany — which the Köln-centred source cannot return however wide its radius.
+#: Same data as make-it-in-germany.com, which is a translated front-end over
+#: this database and cannot be fetched anyway (robots.txt disallows its filtered
+#: URLs and it sits behind bot protection).
 #:
 #: Deliberately a 7-day window where the regional source uses 30: nationwide
 #: matches roughly eleven times as many postings, and a 30-day first run would

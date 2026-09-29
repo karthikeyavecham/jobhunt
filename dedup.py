@@ -77,6 +77,8 @@ _CITY_ALIASES = {
     "brunswick": "braunschweig",
     "vienna": "wien",
     "zurich": "zuerich",
+    "madras": "chennai",
+    "bombay": "mumbai",
     # ASCII spellings that drop the umlaut instead of expanding it
     "koln": "koeln",
     "dusseldorf": "duesseldorf",
