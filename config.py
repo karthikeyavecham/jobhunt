@@ -65,10 +65,10 @@ DEFAULTS = {
     "slack.notify_from": "08:00",
     "slack.notify_until": "22:00",
     # --- Region filter ------------------------------------------------------
+    "filter.country": "in",            # "de" or "in"
     "filter.allow_remote": True,
-    # On-site roles elsewhere in Germany. Off by default: relocating is a
-    # bigger decision than commuting, and leaving it on would bury the
-    # commutable roles under everything from Munich to Rostock.
+    # On-site roles elsewhere in the selected country. Off by default:
+    # relocating is a bigger decision than commuting.
     "filter.allow_relocation": False,
     "filter.max_age_days": 0,          # 0 = no age cutoff
     "filter.company_blocklist": [],
@@ -76,7 +76,7 @@ DEFAULTS = {
 
 #: Values stored as JSON rather than bare strings.
 _JSON_KEYS = {"filter.company_blocklist", "filter.commutable_cities",
-              "filter.germany_cities", "slack.allowed_user_ids",
+              "filter.india_cities", "slack.allowed_user_ids",
               "documents.blocklist", "sources.removed"}
 _BOOL_KEYS = {"llm.fallback.enabled", "scoring.enabled", "filter.allow_remote",
               "filter.allow_relocation", "slack.enabled", "schedule.enabled"}

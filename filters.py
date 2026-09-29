@@ -1,48 +1,58 @@
 """Stage-0 relevance: the free, deterministic filter that runs before any LLM call.
 
 Arbeitnow has no server-side location filter and returns postings from all over
-Europe — measured on live data, 72 of 270 were UK roles and 112 were in Berlin,
-Munich or Hamburg. Sending those to a model would waste most of the scoring
-budget on jobs that were never viable.
+the world — measured on live data, 72 of 270 were UK roles and 112 were in
+Berlin, Munich or Hamburg. Sending those to a model would waste most of the
+scoring budget on jobs that were never viable.
 
 Postings are **marked, not dropped**. A failing job is stored with a reason, so
-the exclusion is auditable, reversible when the region config changes, and
-available for backfill when a new job title is added later.
+the exclusion is auditable and reversible when the region config changes.
 """
 
 import re
 
 from . import dedup
 
-# Shipped default: the Rhineland commuter belt. This is a starting point,
-# not a fact about the user — `filter.commutable_cities` overrides the whole
-# list from the config page, and should be set to wherever you actually are.
-DEFAULT_COMMUTABLE = [
-    "koeln", "leverkusen", "duesseldorf", "bonn", "bergisch gladbach",
-    "monchengladbach", "moenchengladbach", "neuss", "hilden", "langenfeld",
-    "solingen", "wuppertal", "remscheid", "dormagen", "troisdorf",
-    "siegburg", "bruehl", "huerth", "frechen", "pulheim", "erkrath",
-    "ratingen", "mettmann", "opladen", "wesseling", "kerpen", "bornheim",
-    "sankt augustin", "lohmar", "rosrath", "roesrath", "overath", "burscheid",
-    "monheim", "haan", "velbert", "duisburg", "essen", "mulheim", "muelheim",
-    "oberhausen", "krefeld", "aachen", "dortmund", "bochum", "gelsenkirchen",
-    "hagen", "lindlar", "juelich", "julich", "gummersbach", "euskirchen",
+# Country selector values.
+COUNTRY_DE = "de"
+COUNTRY_IN = "in"
+DEFAULT_COUNTRY = COUNTRY_IN  # change this to switch the default region
+
+# --- Germany defaults -------------------------------------------------------
+DE_COMMUTABLE = [
+    "berlin", "münchen", "munich", "hamburg", "koeln", "cologne",
+    "frankfurt", "stuttgart", "düsseldorf", "dortmund", "essen",
+    "leipzig", "bremen", "dresden", "hanover", "heinrichsdorf",
 ]
 
-# Elsewhere in Germany: reachable only if the role is remote.
-DEFAULT_GERMANY_ELSEWHERE = [
-    "berlin", "muenchen", "hamburg", "frankfurt", "stuttgart", "nuernberg",
-    "hannover", "bremen", "leipzig", "dresden", "mannheim", "karlsruhe",
-    "augsburg", "wiesbaden", "mainz", "muenster", "bielefeld", "kiel",
-    "rostock", "erfurt", "freiburg", "heidelberg", "regensburg", "ulm",
-    "wolfsburg", "ingolstadt", "darmstadt", "kassel", "saarbruecken",
-    "potsdam", "jena", "magdeburg", "luebeck", "osnabrueck", "paderborn",
-    "wuerzburg", "heilbronn", "gilching", "herzogenaurach", "walldorf",
+DE_FOREIGN_MARKERS = [
+    # India / South Asia (foreign when searching Germany)
+    "india", "bharat", "bangalore", "mumbai", "delhi", "hyderabad",
+    "chennai", "pune", "kolkata", "ahmedabad", "kochi", "coimbatore",
+    # Everywhere else
+    "united states", "usa", "new york", "san francisco", "toronto",
+    "vancouver", "canada", "seattle", "boston", "australia", "sydney",
+    "singapore", "dubai", "uae", "israel", "tel aviv", "turkey",
+    "istanbul", "mexico", "brazil", "argentina", "japan", "tokyo",
+    "south korea", "seoul", "china", "shanghai", "beijing",
 ]
 
-# Markers that place a posting outside Germany. Checked against the raw
-# location string, so multi-word country names are matched too.
-FOREIGN_MARKERS = [
+# --- India defaults ---------------------------------------------------------
+IN_COMMUTABLE = [
+    "bangalore", "bengaluru", "hyderabad", "chennai", "mumbai", "pune",
+    "delhi", "new delhi", "noida", "gurgaon", "gurugram", "faridabad",
+]
+
+IN_ELSEWHERE = [
+    "ahmedabad", "kochi", "kozhikode", "calicut", "thiruvananthapuram",
+    "trivandrum", "coimbatore", "madurai", "visakhapatnam", "vijayawada",
+    "chandigarh", "lucknow", "kanpur", "jaipur", "indore", "bhopal",
+    "patna", "kolkata", "surat", "vadodara", "nagpur", "thane", "mysuru",
+    "mangalore", "tiruchirappalli", "warangal", "pimpri-chinchwad",
+]
+
+IN_FOREIGN_MARKERS = [
+    # Europe
     "united kingdom", "london", "manchester", "birmingham", "cheltenham",
     "chatham", "edinburgh", "glasgow", "bristol", "leeds", "cambridge",
     "oxford", "england", "scotland", "wales",
@@ -56,22 +66,33 @@ FOREIGN_MARKERS = [
     "denmark", "copenhagen", "norway", "oslo", "finland", "helsinki",
     "switzerland", "zurich", "zuerich", "geneva", "basel", "bern",
     "austria", "vienna", "wien", "graz", "salzburg",
-    "united states", "usa", "new york", "san francisco", "canada", "toronto",
-    "india", "bangalore", "singapore", "australia", "sydney", "dubai",
+    # North America
+    "united states", "usa", "new york", "san francisco", "toronto", "vancouver",
+    "canada", "seattle", "boston", "austin", "chicago", "miami",
+    # Middle East / Asia-Pacific
+    "singapore", "australia", "sydney", "dubai", "abu dhabi", "uae",
     "estonia", "tallinn", "latvia", "riga", "lithuania", "vilnius",
     "croatia", "zagreb", "slovakia", "bratislava", "slovenia", "ljubljana",
     "serbia", "belgrade", "ukraine", "turkey", "istanbul", "israel", "tel aviv",
 ]
 
-GERMANY_MARKERS = ["deutschland", "germany"]
+INDIA_MARKERS = ["india", "bharat"]
+
+# --- resolved defaults (set at import time) ---------------------------------
+DEFAULT_COMMUTABLE = locals()[f"{DEFAULT_COUNTRY.upper()}_COMMUTABLE"]
+FOREIGN_MARKERS = locals()[f"{DEFAULT_COUNTRY.upper()}_FOREIGN_MARKERS"]
+if DEFAULT_COUNTRY == COUNTRY_IN:
+    DEFAULT_INDIA_ELSEWHERE = IN_ELSEWHERE
+else:
+    DEFAULT_INDIA_ELSEWHERE = []  # not used for Germany
 
 # Reasons, used both for storage and for the UI.
 PASS_COMMUTABLE = "commutable"
-PASS_REMOTE_DE = "remote (Germany)"
+PASS_REMOTE_IN = "remote (local)"
 PASS_REMOTE_UNKNOWN = "remote (location unstated)"
-PASS_RELOCATION = "elsewhere in Germany, relocation allowed"
-FAIL_FOREIGN = "outside Germany"
-FAIL_TOO_FAR = "elsewhere in Germany, not remote"
+PASS_RELOCATION = "elsewhere in country, relocation allowed"
+FAIL_FOREIGN = "outside country"
+FAIL_TOO_FAR = "elsewhere in country, not remote"
 FAIL_NO_LOCATION = "no location and not remote"
 FAIL_TOO_OLD = "posting too old"
 
@@ -79,18 +100,14 @@ _WS = re.compile(r"\s+")
 
 
 def _haystack(location):
-    """Umlaut-folded, alias-resolved, punctuation-stripped location.
+    """Lowercase, punctuation-stripped, alias-resolved location.
 
-    Aliases are applied **per token**, so "Cologne" matches the commutable list
-    entry "koeln" and "Mindfuel Munich" resolves its city half to "muenchen".
-    Without this the city lists would only match German spellings, and a
-    Cologne posting from an English-language board would be filtered out —
-    the exact opposite of what the region config says.
+    Aliases are applied per token so "Madras" matches the commutable list entry
+    "chennai". Without this, city lists would only match exact spellings.
     """
     if not location:
         return ""
-    folded = dedup._fold(location)
-    cleaned = _WS.sub(" ", re.sub(r"[^a-z0-9 ]+", " ", folded)).strip()
+    cleaned = re.sub(r"[^a-z0-9 ]+", " ", location.lower()).strip()
     tokens = [
         dedup._CITY_ALIASES.get(token, token)
         for token in cleaned.split()
@@ -109,34 +126,35 @@ def check_location(location, remote, config=None):
     """Return (passes, reason).
 
     A posting is relevant when it is commutable from the configured home region,
-    or remote and
-    plausibly German. Foreign postings are rejected even when remote, because a
-    UK-based remote role generally cannot be filled from Germany.
+    or remote and plausibly local. Foreign postings are rejected even when
+    remote.
 
-    With `allow_relocation`, on-site roles elsewhere in Germany pass too. That
-    only applies to locations *recognised* as German: an unrecognised city
-    stays out, because the foreign check is a denylist and "not on it" is not
-    evidence of being in Germany — Arbeitnow returns Europe-wide results, and
-    relocating to Köln is the point, not relocating to Kraków.
+    With `allow_relocation`, on-site roles elsewhere in the country pass too.
     """
     config = config or {}
+    country = config.get("country") or DEFAULT_COUNTRY
     commutable = config.get("commutable_cities") or DEFAULT_COMMUTABLE
-    elsewhere = config.get("germany_cities") or DEFAULT_GERMANY_ELSEWHERE
     allow_remote = config.get("allow_remote", True)
     allow_relocation = config.get("allow_relocation", False)
 
     hay = _haystack(location)
 
-    # Commutable wins outright, even if the string also names a country.
+    # Commutable wins outright.
     if hay and _contains(hay, commutable):
         return True, PASS_COMMUTABLE
 
     if hay and _contains(hay, FOREIGN_MARKERS):
         return False, FAIL_FOREIGN
 
-    if hay and (_contains(hay, elsewhere) or _contains(hay, GERMANY_MARKERS)):
+    # Country-specific markers (e.g. "india" when searching India).
+    country_markers = INDIA_MARKERS if country == COUNTRY_IN else []
+    elsewhere = config.get("india_cities") or (
+        IN_ELSEWHERE if country == COUNTRY_IN else []
+    )
+
+    if hay and (_contains(hay, elsewhere) or _contains(hay, country_markers)):
         if remote and allow_remote:
-            return True, PASS_REMOTE_DE
+            return True, PASS_REMOTE_IN
         if allow_relocation:
             return True, PASS_RELOCATION
         return False, FAIL_TOO_FAR
@@ -146,8 +164,6 @@ def check_location(location, remote, config=None):
         return True, PASS_REMOTE_UNKNOWN
     if not hay:
         return False, FAIL_NO_LOCATION
-    # An unrecognised city that is not remote — treat as too far, but the
-    # reason makes it findable in the excluded view if the list needs widening.
     return False, FAIL_TOO_FAR
 
 
@@ -190,8 +206,9 @@ def evaluate(job, config=None):
 
 # Settings keys, so the config page and the filter agree on names.
 SETTING_KEYS = {
+    "country": "filter.country",
     "commutable_cities": "filter.commutable_cities",
-    "germany_cities": "filter.germany_cities",
+    "india_cities": "filter.india_cities",
     "company_blocklist": "filter.company_blocklist",
     "allow_remote": "filter.allow_remote",
     "allow_relocation": "filter.allow_relocation",

@@ -281,6 +281,13 @@
     <input type="hidden" name="section" value="filter">
     <div class="kv">
       <div>
+        <label for="country">Country</label>
+        <select id="country" name="filter.country">
+          <option value="in" {% if s['filter.country'] == 'in' %}selected{% endif %}>India</option>
+          <option value="de" {% if s['filter.country'] == 'de' %}selected{% endif %}>Germany</option>
+        </select>
+      </div>
+      <div>
         <label for="allow_remote">Remote roles</label>
         <select id="allow_remote" name="filter.allow_remote">
           <option value="1" {% if s['filter.allow_remote'] %}selected{% endif %}>Include</option>
@@ -288,7 +295,7 @@
         </select>
       </div>
       <div>
-        <label for="allow_relocation">On-site roles elsewhere in Germany</label>
+        <label for="allow_relocation">On-site roles elsewhere in {{ 'India' if s['filter.country'] == 'in' else 'Germany' }}</label>
         <select id="allow_relocation" name="filter.allow_relocation">
           <option value="1" {% if s['filter.allow_relocation'] %}selected{% endif %}>Include — open to relocating</option>
           <option value="0" {% if not s['filter.allow_relocation'] %}selected{% endif %}>Exclude — commutable or remote only</option>
